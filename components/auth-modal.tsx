@@ -5,11 +5,21 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [companyName, setCompanyName] = useState("")
+  const [person, setPerson] = useState("")
   const [isLogin, setIsLogin] = useState(true)
+  const [sector, setSector] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,8 +37,8 @@ export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
               <span className="text-white text-lg font-bold">A</span>
             </div>
             <h1 className="text-3xl font-bold">
-              <span className="text-gray-800">plan</span>
-              <span className="text-green-600">A</span>
+              <span className="text-green-600">ECHO</span>
+              <span className="text-gray-800">grade</span>
             </h1>
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mt-6">{isLogin ? "Welcome Back" : "Create Account"}</h2>
@@ -46,6 +56,47 @@ export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
               className="w-full"
             />
           </div>
+
+
+          {!isLogin && (<>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+              <Input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Tesla"
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Person</label>
+              <Input
+                type="text"
+                value={person}
+                onChange={(e) => setPerson(e.target.value)}
+                placeholder="Abinaya Latua"
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Select Sector</label>
+              <Select value={sector} onValueChange={setSector}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Firm"/>
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="cement">Cement Industry</SelectItem>
+                    <SelectItem value="petroleum">Petroleum Industry</SelectItem>
+                    <SelectItem value="aluminium">Aluminium Industry</SelectItem>
+                  </SelectContent>
+              </Select>
+            </div>
+            </>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
