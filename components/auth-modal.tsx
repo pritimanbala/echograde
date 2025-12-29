@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import  Link  from "next/link"
 import {
   Select,
   SelectContent,
@@ -20,7 +21,6 @@ export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
   const [person, setPerson] = useState("")
   const [isLogin, setIsLogin] = useState(true)
   const [sector, setSector] = useState("")
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (email && password) {
@@ -45,7 +45,7 @@ export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
           <p className="text-gray-600 text-sm mt-2">Emissions management platform</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 flex align-center justify-center flex-col">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <Input
@@ -112,14 +112,14 @@ export function AuthModal({ onLogin }: { onLogin: (email: string) => void }) {
           <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white">
             {isLogin ? "Sign In" : "Create Account"}
           </Button>
+        <Link
+          href="/get-started"
+          className="w-full mt-4 text-sm text-gray-600 hover:text-gray-900 font-medium text-center"
+          
+        >"Don't have an account? Sign up"
+        </Link>
         </form>
 
-        <button
-          onClick={() => setIsLogin(!isLogin)}
-          className="w-full mt-4 text-sm text-gray-600 hover:text-gray-900 font-medium"
-        >
-          {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-        </button>
       </div>
     </div>
   )
