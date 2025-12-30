@@ -1,6 +1,6 @@
-import { Header } from "@/components/companyportal/header"
-import { GetStartedForm } from "@/components/companyportal/get-started-form"
-import { Footer } from "@/components/companyportal/footer"
+import { Header } from "@/components/homepage/header"
+import { GetStartedForm } from "@/components/homepage/get-started-form"
+import { Footer } from "@/components/homepage/footer"
 
 export default function GetStartedPage() {
   return (

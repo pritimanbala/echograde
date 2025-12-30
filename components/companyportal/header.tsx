@@ -1,79 +1,68 @@
-"use client"
+"use client";
+import Link from "next/link";
+import { Settings } from "lucide-react";
 
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
-import Link from "next/link"
+export function Header({
+	onLogout,
+	onPageChange,
+	currentPage,
+}: {
+	user: { email: string };
+	onLogout: () => void;
+	onPageChange: (page: "dashboard" | "measure" | "collect" | "report" | "reduce") => void;
+	currentPage: "dashboard" | "measure" | "collect" | "report" | "reduce";
+}) {
+	const pages = [
+		{ id: "dashboard", label: "Dashboard" },
+		{ id: "collect", label: "Collect & update data" },
+		{ id: "measure", label: "Measure Emmissions" },
+		{ id: "report", label: "Report emissions" },
+		{ id: "reduce", label: "Reduce emissions" },
+	] as const;
 
-export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+	return (
+		<header className="bg-white border-b border-gray-200">
+			<div className="flex items-center justify-between px-6 py-4">
+				{/* Logo */}
+				<a href="/" className="flex items-center" style={{ textDecoration: "none" }}>
+					<div className="w-8 h-8 mx-4 bg-gray-800 rounded flex items-center justify-center">
+						<span className="text-white text-sm font-bold">Eg</span>
+					</div>
+					<span className="text-2xl font-bold text-green-600">ECHO</span>
+					<span className="text-2xl font-bold text-gray-800">grade</span>
+				</a>
 
-  return (
-    <header className="fixed top-0 h-[10vh] w-full bg-background/80 backdrop-blur-sm border-b border-border z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="text-xl font-bold text-accent">
-            <span className="text-green-700">ECHO</span>
-            <span className="text-white">grade</span>
-          </div>
+				{/* Navigation */}
+				<nav className="flex gap-8">
+					{pages.map((page) => (
+						<button
+							key={page.id}
+							onClick={() => onPageChange(page.id)}
+							className={`text-sm font-medium transition-colors pb-2 border-b-2 ${
+								currentPage === page.id
+									? "text-gray-800 border-green-500"
+									: "text-gray-600 border-transparent hover:text-gray-800"
+							}`}>
+							{page.label}
+						</button>
+					))}
+				</nav>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8">
-            <a href="/#about" className="text-sm font-medium hover:text-accent transition-colors">
-              About
-            </a>
-            <a href="/#solutions" className="text-sm font-medium hover:text-accent transition-colors">
-              Solutions
-            </a>
-            <a href="/#impact" className="text-sm font-medium hover:text-accent transition-colors">
-              Impact
-            </a>
-            <a href="/#contact" className="text-sm font-medium hover:text-accent transition-colors">
-              Contact
-            </a>
-          </nav>
-          <div className="flex w-fit gap-8 justify-around ">
-          <Link href="/companyportal" className="text-sm font-medium hover:text-accent transition-colors  mt-2">
-              Login
-          </Link>
-          <Link
-            href="/get-started"
-            className="hidden md:block px-6 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Get Started
-          </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <nav className="md:hidden pb-4 space-y-2">
-            <a href="#about" className="block text-sm font-medium hover:text-accent transition-colors">
-              About
-            </a>
-            <a href="#solutions" className="block text-sm font-medium hover:text-accent transition-colors">
-              Solutions
-            </a>
-            <a href="#impact" className="block text-sm font-medium hover:text-accent transition-colors">
-              Impact
-            </a>
-            <a href="#contact" className="block text-sm font-medium hover:text-accent transition-colors">
-              Contact
-            </a>
-            <Link
-              href="/get-started"
-              className="block px-4 py-2 bg-accent text-accent-foreground rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              Get Started
-            </Link>
-          </nav>
-        )}
-      </div>
-    </header>
-  )
+				{/* CSRD Manager and Icons */}
+				<div className="flex items-center gap-4">
+					<button className="text-sm font-medium text-gray-700 hover:text-gray-900">
+						Admin
+					</button>
+					<button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
+						<Settings size={20} className="text-gray-600" />
+					</button>
+					<button
+						onClick={onLogout}
+						className="ml-2 text-sm text-gray-600 hover:text-gray-900 font-medium">
+						Logout
+					</button>
+				</div>
+			</div>
+		</header>
+	);
 }

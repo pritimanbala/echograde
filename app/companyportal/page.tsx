@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Dashboard } from "@/components/dashboard"
-import { AuthModal } from "@/components/auth-modal"
+import { Dashboard } from "@/components/companyportal/dashboard"
+import { AuthModal } from "@/components/companyportal/auth-modal"
 
 export default function Home() {
   const [user, setUser] = useState<{ email: string } | null>(null)
