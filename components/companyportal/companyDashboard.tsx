@@ -19,7 +19,7 @@ export function CompanyDashboard() {
 		<div className="flex-1 flex flex-col bg-gray-50 overflow-auto min-h-screen">
 			<div className="p-8 space-y-6">
 				{/* Section 1: Two Status Cards */}
-				<div className="grid grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 gap-6">
 					{/* Left Card - CCTS Target Loaded */}
 					<div className="bg-white rounded-lg shadow-sm border-l-4 border-green-500 p-6">
 						<div className="flex items-start justify-between mb-4">
@@ -53,7 +53,7 @@ export function CompanyDashboard() {
 					</div>
 
 					{/* Right Card - Data Upload Status */}
-					<div className="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-6">
+					{/* <div className="bg-white rounded-lg shadow-sm border-l-4 border-amber-500 p-6">
 						<h3 className="text-sm font-semibold text-gray-600 mb-6">
 							Data Upload Status
 						</h3>
@@ -62,7 +62,6 @@ export function CompanyDashboard() {
 								<p className="text-6xl font-bold text-gray-800 mb-4">
 									{data.data.length}/8
 								</p>
-								{/* Progress Bar */}
 								<div className="w-full bg-gray-200 rounded-full h-3">
 									<div
 										className="bg-amber-500 h-3 rounded-full transition-all duration-300"
@@ -78,7 +77,7 @@ export function CompanyDashboard() {
 								<ArrowRight size={18} />
 							</button>
 						</div>
-					</div>
+					</div> */}
 				</div>
 
 				{/* Section 2: Hero CTA with Penalty Risk */}

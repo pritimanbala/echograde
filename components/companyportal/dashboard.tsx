@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Header } from "./header";
-import { Sidebar } from "./sidebar";
+// import { Sidebar } from "./sidebar";
 import { CollectDataPage } from "./collect-data";
 import { MeasureEmissionsPage } from "./measure-emissions";
 import { ReportEmissionsPage } from "./report-emissions";
@@ -12,7 +12,7 @@ import { CompanyDashboard } from "./companyDashboard";
 export function Dashboard({ user, onLogout }: { user: { email: string }; onLogout: () => void }) {
 	const [currentPage, setCurrentPage] = useState<
 		"dashboard" | "collect" | "measure" | "report" | "reduce"
-	>("measure");
+	>("dashboard");
 
 	const renderPage = () => {
 		switch (currentPage) {
@@ -31,7 +31,7 @@ export function Dashboard({ user, onLogout }: { user: { email: string }; onLogou
 
 	return (
 		<div className="flex h-screen bg-gray-700">
-			<Sidebar currentPage={currentPage} onPageChange={setCurrentPage} />
+			{/* <Sidebar currentPage={currentPage} onPageChange={setCurrentPage} /> */}
 			<div className="flex-1 flex flex-col overflow-hidden">
 				<Header
 					user={user}

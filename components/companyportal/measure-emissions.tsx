@@ -1,171 +1,206 @@
 "use client";
 
-import { MouseEventHandler, useEffect, useState } from "react";
-import { getEmissionsData, type EmissionData } from "@/lib/emissions-store";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useState } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "../ui/file-upload";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export function MeasureEmissionsPage() {
-	const [emissionsData, setEmissionsData] = useState<EmissionData[]>([]);
-	// const [selectedCategory, setSelectedCategory] = useState("Purchased goods and services")
-	const selectedCategory = "Purchased goods and services";
-	const [isFile, setFile] = useState<boolean>(false);
-	useEffect(() => {
-		setEmissionsData(getEmissionsData());
-	}, []);
+	const [expandedDetails, setExpandedDetails] = useState(false);
 
-	const totalEmissions = emissionsData.reduce((sum, d) => sum + d.value, 0);
-	const emissionsPerEmployee = totalEmissions / 3100; // Assuming 3,100 employees
-	const totalSpend = 285142158.6; // Sample data
-	const spendPerEmployee = totalSpend / 3100;
+	// GEI Data
+	const currentGEI = 0.0475;
+	const targetGEI = 0.0436;
+	const gapGEI = Math.round((currentGEI - targetGEI) * 10000) / 10000;
+	const gapPercentage = ((gapGEI / targetGEI) * 100).toFixed(0);
 
-	const emissionsOverTime = [
-		{ quarter: "Q1 2022", emissions: 41500 },
-		{ quarter: "Q2 2022", emissions: 33200 },
-		{ quarter: "Q3 2022", emissions: 44800 },
-		{ quarter: "Q4 2022", emissions: 47300 },
-		{ quarter: "Q1 2023", emissions: 35900 },
-		{ quarter: "Q2 2023", emissions: 32100 },
-		{ quarter: "Q3 2023", emissions: 47200 },
-		{ quarter: "Q4 2023", emissions: 43600 },
+	// Scope Breakdown
+	const scopeBreakdown = [
+		{ name: "Process", value: 1785, color: "#ef4444" },
+		{ name: "Fuel", value: 814, color: "#f97316" },
+		{ name: "Grid", value: 451, color: "#3b82f6" },
+	];
+
+	const totalEmissions = scopeBreakdown.reduce((sum, item) => sum + item.value, 0);
+
+	// Penalty Calculation
+	const penaltyRiskGap = 3409; // in thousands tCO₂e
+	const penaltyAmount = penaltyRiskGap * 100; // ₹1,000/t = ₹100k per 1k t
+
+	// GEI Gauge calculation - proportional arc for red sector
+	const geiValue = [
+		{ stats: "achieved", value: currentGEI, color: "#0da321" },
+		{ stats: "left", value: gapGEI, color: "#f97316" },
 	];
 
 	return (
-		<div className={`bg-gray-50 min-h-screen p-8 relative `}>
-			<div className={`max-w-7xl mx-auto ${isFile ? "opacity-55" : "opacity-100"}`}>
-				<div className="flex items-center justify-between mb-8">
-					<div className="flex items-center gap-4">
-						<div className="w-10 h-10 bg-gray-300 rounded flex items-center justify-center">
-							<span className="text-gray-600 text-lg">📋</span>
+		<div className="bg-gray-50 min-h-screen p-8">
+			<div className="max-w-7xl mx-auto space-y-8">
+				{/* Section 1: GEI Gauge */}
+				<div className="bg-[#ffffff] rounded-lg border border-gray-200 p-8">
+					<h2 className="text-2xl font-bold text-gray-900 mb-8">
+						GEI Calculation Results
+					</h2>
+
+					<div className="flex flex-col items-center gap-8">
+						{/* Circular Gauge */}
+						<div className="relative w-64 h-64">
+							<ResponsiveContainer width="100%" height="100%">
+								<PieChart>
+									<Pie
+										data={geiValue}
+										cx="50%"
+										cy="50%"
+										innerRadius={60}
+										outerRadius={120}
+										dataKey="value">
+										{geiValue.map((entry, index) => (
+											<Cell key={`cell-${index}`} fill={entry.color} />
+										))}
+									</Pie>
+									<Tooltip
+										formatter={(value) => [`${value.toString()}`]}
+										contentStyle={{
+											backgroundColor: "#fff",
+											border: "1px solid #e5e7eb",
+										}}
+									/>
+								</PieChart>
+							</ResponsiveContainer>
 						</div>
-						<h1 className="text-3xl font-bold text-gray-800">{selectedCategory}</h1>
-					</div>
-					<div className="flex gap-3">
-						<Button
-							variant="outline"
-							className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent">
-							See data uploads
-						</Button>
-						<Button
-							onClick={() => setFile(!isFile)}
-							className="bg-green-600 hover:bg-green-700 text-white">
-							{!isFile ? (
-								<span>Upload new data</span>
-							) : (
-								<span>Close upload data</span>
-							)}
-						</Button>
+
+						{/* Status Box */}
+						<div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center w-full max-w-md">
+							<p className="text-sm text-gray-600 mb-2">Target: {targetGEI}</p>
+							<p className="text-2xl font-bold text-red-600">
+								❌ Gap: {gapGEI.toFixed(4)} ({gapPercentage}% over)
+							</p>
+						</div>
+						<div className="w-full space-y-3">
+							{geiValue.map((item) => (
+								<div
+									key={item.stats}
+									className="flex items-center justify-between text-sm">
+									<div className="flex items-center gap-3">
+										<div
+											className="w-3 h-3 rounded-full"
+											style={{ backgroundColor: item.color }}></div>
+										<span className="text-gray-700 font-medium">
+											{item.stats}
+										</span>
+									</div>
+									<span className="text-gray-900 font-semibold">
+										{item.value}k tCO₂e
+									</span>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-2">
-							<span className="text-gray-700 font-medium">📅 All data</span>
-						</div>
-						<div className="flex items-center gap-2 text-gray-500">
-							<span>⟷ Compare to</span>
-						</div>
-					</div>
-					<div className="flex items-center gap-3">
-						<button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100">
-							<span>⚙️ Add filter</span>
-						</button>
-						<button className="p-2 border border-gray-300 rounded hover:bg-gray-100">
-							<span>☰</span>
-						</button>
-					</div>
-				</div>
+				{/* Section 2: Scope Breakdown + Penalty */}
+				<div className="grid grid-cols-3 gap-8">
+					{/* Pie Chart Card */}
+					<div className="col-span-2 bg-white rounded-lg border border-gray-200 p-8">
+						<h3 className="text-xl font-bold text-gray-900 mb-6">Scope Breakdown</h3>
 
-				<div className="grid grid-cols-4 gap-4 mb-8">
-					<div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-						<p className="text-gray-500 text-sm font-medium mb-2">Total emissions</p>
-						<p className="text-2xl font-bold text-gray-900">
-							{(totalEmissions / 1000).toFixed(2)}
-						</p>
-						<p className="text-gray-600 text-xs mt-1">tCO₂e</p>
-					</div>
-
-					<div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-						<p className="text-gray-500 text-sm font-medium mb-2">
-							Emissions per employee
-						</p>
-						<p className="text-2xl font-bold text-gray-900">
-							{(emissionsPerEmployee / 10).toFixed(2)}
-						</p>
-						<p className="text-gray-600 text-xs mt-1">kgCO₂e</p>
-					</div>
-
-					<div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-						<p className="text-gray-500 text-sm font-medium mb-2">Total spend</p>
-						<p className="text-2xl font-bold text-gray-900">
-							{(totalSpend / 1000000).toFixed(1)}
-						</p>
-						<p className="text-gray-600 text-xs mt-1">EUR</p>
-					</div>
-
-					<div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-						<p className="text-gray-500 text-sm font-medium mb-2">Spend per employee</p>
-						<p className="text-2xl font-bold text-gray-900">
-							{(spendPerEmployee / 1000).toFixed(1)}
-						</p>
-						<p className="text-gray-600 text-xs mt-1">EUR/employee</p>
-					</div>
-				</div>
-
-				<div className="bg-white p-8 rounded-lg border border-gray-200">
-					<div className="flex items-center justify-between mb-6">
-						<h2 className="text-xl font-bold text-gray-900">Emissions over time</h2>
-						<div className="flex items-center gap-3">
-							<div className="flex items-center gap-2">
-								<button className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 text-sm font-medium">
-									Select breakdown
-								</button>
-								<div className="w-6 h-6 rounded-full border-4 border-green-500 animate-spin"></div>
+						<div className="flex flex-col items-center gap-8">
+							<div className="w-64 h-64">
+								<ResponsiveContainer width="100%" height="100%">
+									<PieChart>
+										<Pie
+											data={scopeBreakdown}
+											cx="50%"
+											cy="50%"
+											innerRadius={60}
+											outerRadius={120}
+											dataKey="value">
+											{scopeBreakdown.map((entry, index) => (
+												<Cell key={`cell-${index}`} fill={entry.color} />
+											))}
+										</Pie>
+										<Tooltip
+											formatter={(value) => [`${value}k tCO₂e`, "Emissions"]}
+											contentStyle={{
+												backgroundColor: "#fff",
+												border: "1px solid #e5e7eb",
+											}}
+										/>
+									</PieChart>
+								</ResponsiveContainer>
 							</div>
-							<select className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 text-sm font-medium">
-								<option>Time intervals</option>
-							</select>
-							<button className="p-2 text-gray-600 hover:bg-gray-100 rounded">
-								⋮
-							</button>
+
+							<div className="w-full space-y-3">
+								{scopeBreakdown.map((item) => (
+									<div
+										key={item.name}
+										className="flex items-center justify-between text-sm">
+										<div className="flex items-center gap-3">
+											<div
+												className="w-3 h-3 rounded-full"
+												style={{ backgroundColor: item.color }}></div>
+											<span className="text-gray-700 font-medium">
+												{item.name}
+											</span>
+										</div>
+										<span className="text-gray-900 font-semibold">
+											{item.value}k tCO₂e
+										</span>
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
 
-					<div className="h-96 -mx-4">
-						<ResponsiveContainer width="100%" height="100%">
-							<BarChart
-								data={emissionsOverTime}
-								margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-								<CartesianGrid
-									strokeDasharray="0"
-									stroke="#e5e7eb"
-									vertical={true}
-								/>
-								<XAxis
-									dataKey="quarter"
-									stroke="#6b7280"
-									style={{ fontSize: "12px" }}
-								/>
-								<YAxis stroke="#6b7280" style={{ fontSize: "12px" }} />
-								<Tooltip
-									contentStyle={{
-										backgroundColor: "#fff",
-										border: "1px solid #e5e7eb",
-									}}
-								/>
-								<Bar dataKey="emissions" fill="#22c55e" radius={[4, 4, 0, 0]} />
-							</BarChart>
-						</ResponsiveContainer>
+					{/* Penalty Card */}
+					<div className="bg-white rounded-lg border border-gray-200 p-8 flex flex-col justify-between">
+						<div>
+							<h3 className="text-xl font-bold text-gray-900 mb-6">
+								💰 Penalty Risk
+							</h3>
+
+							<div className="bg-gray-50 rounded p-6 font-mono text-sm text-gray-800 space-y-3 my-4">
+								<div>
+									<span className="text-gray-600">Scope 1 Process: </span>
+									<span className="text-gray-900 font-semibold">
+										3.5M t × 0.51 = 1,785k tCO₂e
+									</span>
+								</div>
+								<div>
+									<span className="text-gray-600">Scope 1 Fuel: </span>
+									<span className="text-gray-900 font-semibold">
+										332k t coal × 2.45 = 814k tCO₂e
+									</span>
+								</div>
+								<div>
+									<span className="text-gray-600">Scope 2 Grid: </span>
+									<span className="text-gray-900 font-semibold">
+										620 GWh × 0.727 = 451k tCO₂e
+									</span>
+								</div>
+								<div className="border-t border-gray-300 pt-3 mt-3">
+									<div className="text-gray-600">
+										Total: {totalEmissions}k tCO₂e ÷ 5.38M t ={" "}
+										{currentGEI.toFixed(4)} GEI
+									</div>
+								</div>
+							</div>
+							<div className="mb-8">
+								<p className="text-4xl font-bold text-red-600 mb-2">
+									₹{(penaltyAmount / 10000000).toFixed(1)}Cr
+								</p>
+								<p className="text-sm text-gray-600">
+									{penaltyRiskGap}k tCO₂e gap × ₹1,000/t
+								</p>
+							</div>
+						</div>
+
+						<Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-base">
+							GENERATE RECOMMENDATIONS
+						</Button>
 					</div>
 				</div>
 			</div>
-			{isFile && (
-				<div className="w-full z-50 absolute shadow-2xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-4xl mx-auto min-h-96 border border-dashed bg-white border-neutral-800 rounded-lg">
-					<FileUpload />
-				</div>
-			)}
 		</div>
 	);
 }

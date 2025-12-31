@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 export function Hero() {
 	return (
-		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden h-[90vh]">
+		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
 			{/* Background Image */}
 			<div
-				className="absolute inset-0 bg-cover bg-center"
+				className="absolute inset-0 bg-cover bg-center opacity-40"
 				style={{
 					backgroundImage: 'url("/chimney.jpg")',
 				}}
@@ -15,17 +17,31 @@ export function Hero() {
 			{/* Content */}
 			<div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 				<h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance leading-tight">
-					Make a World
+					Reduce Emissions.
 					<br />
-					of Difference
+					Improve Efficiency.
+					<br />
+					Avoid Penalties.
 				</h1>
 				<p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-					We advise and certify organizations committed to authentic environmental and
-					nature conservation progress.
+					Science-backed industrial decarbonization for manufacturing plants. Measurable
+					emissions reductions, compliance readiness, and carbon credit eligibility.
 				</p>
-				<button className="px-8 py-3 bg-accent text-accent-foreground rounded-full font-medium hover:opacity-90 transition-opacity">
-					Learn More
-				</button>
+
+				<div className="flex flex-col sm:flex-row gap-4 justify-center">
+					<Link
+						href="/get-started"
+						className="px-8 py-3 bg-accent text-accent-foreground rounded-full font-medium hover:opacity-90 transition-opacity">
+						Get Started
+					</Link>
+					<button className="px-8 py-3 border border-accent text-accent rounded-full font-medium hover:bg-accent/10 transition-colors">
+						Watch Demo
+					</button>
+				</div>
+
+				<p className="text-sm text-muted-foreground mt-6">
+					Free compliance & emission reduction assessment • Audit-ready documentation
+				</p>
 			</div>
 		</section>
 	);

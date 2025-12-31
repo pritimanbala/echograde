@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { Settings } from "lucide-react";
 
 export function Header({
@@ -16,8 +15,8 @@ export function Header({
 		{ id: "dashboard", label: "Dashboard" },
 		{ id: "collect", label: "Collect & update data" },
 		{ id: "measure", label: "Measure Emmissions" },
-		{ id: "report", label: "Report emissions" },
 		{ id: "reduce", label: "Reduce emissions" },
+		{ id: "report", label: "Report emissions" },
 	] as const;
 
 	return (
