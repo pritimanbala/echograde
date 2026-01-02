@@ -12,10 +12,13 @@ export function Header() {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center h-16">
 					{/* Logo */}
-					<div className="text-xl font-bold text-accent">
-						<span className="text-green-700">ECHO</span>
-						<span className="text-white">grade</span>
-					</div>
+					<a href="/" className="flex items-center" style={{ textDecoration: "none" }}>
+						<div className="w-8 h-8 mx-4 bg-transparent rounded flex items-center justify-center">
+							<img src="logo.png" alt="logo" />
+						</div>
+						<span className="text-2xl font-bold text-green-600">ECHO</span>
+						<span className="text-2xl font-bold text-gray-800">grade</span>
+					</a>
 
 					{/* Desktop Navigation */}
 					<nav className="hidden md:flex gap-8">

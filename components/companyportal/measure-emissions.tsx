@@ -1,27 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { computeGEI } from "./calc";
 
-export function MeasureEmissionsPage() {
+type InputData = {
+	clinker: number; // tonnes
+	cement: number; // tonnes
+	coal: number; // tonnes
+	petcokeMix: number; // %
+	tsrPercentage: number; // %
+	electricity: number; // GWh
+	recsGreenPower: number; // GWh
+	whrsCapacity: number; // MW
+};
+
+interface GEICalculationResult {
+	// ---------- RAW INPUTS ----------
+	inputs: {
+		clinker: number; // tonnes
+		cement: number; // tonnes
+		coal: number; // tonnes
+		petcokeMix: number; // %
+		tsrPercentage: number; // %
+		electricity: number; // GWh
+		recsGreenPower: number; // GWh
+		whrsCapacity: number; // MW
+	};
+
+	// ---------- SCOPE 1 — PROCESS ----------
+	clinker: number; // alias → inputs.clinker
+	cement: number; // alias → inputs.cement
+	coal: number; // alias → inputs.coal
+
+	CO2_process: number; // tCO₂ — clinker × 0.51
+	CO2_coal: number; // tCO₂
+	CO2_petcoke: number; // tCO₂
+	TSR_reduction: number; // tCO₂
+	scope1_fuel: number; // tCO₂
+
+	// ---------- SCOPE 2 — ELECTRICITY ----------
+	gridConsumptionGWh: number; // GWh (electricity - RECs)
+	CO2_grid: number; // tCO₂
+	WHRS_reduction: number; // tCO₂
+	scope2: number; // tCO₂
+
+	// ---------- TOTALS ----------
+	totalGEI_tCO2: number; // tCO₂ (scope1 + scope2)
+	GEI_intensity: number; // tCO₂ / tonne cement
+	targetGEI: number; // optional → benchmark / policy target
+}
+
+export function MeasureEmissionsPage({
+	dat,
+	onPageChange,
+}: {
+	dat: InputData;
+	onPageChange: (page: "dashboard" | "measure" | "collect" | "report" | "reduce") => void;
+}) {
+	const [data, setData] = useState<GEICalculationResult>({
+		inputs: {
+			clinker: 0, // tonnes
+			cement: 0, // tonnes
+			coal: 0, // tonnes
+			petcokeMix: 0, // %
+			tsrPercentage: 0, // %
+			electricity: 0, // GWh
+			recsGreenPower: 0, // GWh
+			whrsCapacity: 0, // MW
+		},
+
+		// ---------- SCOPE 1 — PROCESS ----------
+		clinker: 0, // alias → inputs.clinker
+		cement: 0, // alias → inputs.cement
+		coal: 0, // alias → inputs.coal
+
+		CO2_process: 0, // tCO₂ — clinker × 0.51
+		CO2_coal: 0, // tCO₂
+		CO2_petcoke: 0, // tCO₂
+		TSR_reduction: 0, // tCO₂
+		scope1_fuel: 0, // tCO₂
+
+		// ---------- SCOPE 2 — ELECTRICITY ----------
+		gridConsumptionGWh: 0, // GWh (electricity - RECs)
+		CO2_grid: 0, // tCO₂
+		WHRS_reduction: 0, // tCO₂
+		scope2: 0, // tCO₂
+
+		// ---------- TOTALS ----------
+		totalGEI_tCO2: 0, // tCO₂ (scope1 + scope2)
+		GEI_intensity: 0, // tCO₂ / tonne cement
+		targetGEI: 0,
+	});
 	const [expandedDetails, setExpandedDetails] = useState(false);
-
-	// GEI Data
-	const currentGEI = 0.0475;
-	const targetGEI = 0.0436;
-	const gapGEI = Math.round((currentGEI - targetGEI) * 10000) / 10000;
-	const gapPercentage = ((gapGEI / targetGEI) * 100).toFixed(0);
-
+	useEffect(() => {
+		console.log(dat);
+		console.log("this is not running");
+		setData(computeGEI(dat));
+	}, [dat]);
 	// Scope Breakdown
 	const scopeBreakdown = [
-		{ name: "Process", value: 1785, color: "#ef4444" },
-		{ name: "Fuel", value: 814, color: "#f97316" },
-		{ name: "Grid", value: 451, color: "#3b82f6" },
+		{ name: "Process", value: data.CO2_process, color: "#ef4444" },
+		{ name: "Fuel", value: data.scope1_fuel, color: "#f97316" },
+		{ name: "Grid", value: data.scope2, color: "#3b82f6" },
 	];
 
 	const totalEmissions = scopeBreakdown.reduce((sum, item) => sum + item.value, 0);
+
+	function roundToFixed(value: number, decimals: number): number {
+		return Number(value.toFixed(decimals));
+	}
 
 	// Penalty Calculation
 	const penaltyRiskGap = 3409; // in thousands tCO₂e
@@ -29,8 +118,8 @@ export function MeasureEmissionsPage() {
 
 	// GEI Gauge calculation - proportional arc for red sector
 	const geiValue = [
-		{ stats: "achieved", value: currentGEI, color: "#0da321" },
-		{ stats: "left", value: gapGEI, color: "#f97316" },
+		{ stats: "achieved", value: data.GEI_intensity, color: "#0da321" },
+		{ stats: "left", value: data.GEI_intensity - data.targetGEI, color: "#f97316" },
 	];
 
 	return (
@@ -71,9 +160,10 @@ export function MeasureEmissionsPage() {
 
 						{/* Status Box */}
 						<div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center w-full max-w-md">
-							<p className="text-sm text-gray-600 mb-2">Target: {targetGEI}</p>
+							<p className="text-sm text-gray-600 mb-2">Target: {data.targetGEI}</p>
 							<p className="text-2xl font-bold text-red-600">
-								❌ Gap: {gapGEI.toFixed(4)} ({gapPercentage}% over)
+								❌ Gap: {(data.GEI_intensity - data.targetGEI).toFixed(4)} (
+								{((data.GEI_intensity - data.targetGEI) * 100).toFixed(4)}% over)
 							</p>
 						</div>
 						<div className="w-full space-y-3">
@@ -163,39 +253,51 @@ export function MeasureEmissionsPage() {
 								<div>
 									<span className="text-gray-600">Scope 1 Process: </span>
 									<span className="text-gray-900 font-semibold">
-										3.5M t × 0.51 = 1,785k tCO₂e
+										{data.inputs.clinker}M t × 0.51 = {data.CO2_process}k tCO₂e
 									</span>
 								</div>
 								<div>
 									<span className="text-gray-600">Scope 1 Fuel: </span>
 									<span className="text-gray-900 font-semibold">
-										332k t coal × 2.45 = 814k tCO₂e
+										{data.inputs.coal}k t coal × 2.45 = {data.scope1_fuel} tCO₂e
 									</span>
 								</div>
 								<div>
 									<span className="text-gray-600">Scope 2 Grid: </span>
 									<span className="text-gray-900 font-semibold">
-										620 GWh × 0.727 = 451k tCO₂e
+										{data.inputs.electricity} GWh × 0.727 = {data.scope2}k tCO₂e
 									</span>
 								</div>
 								<div className="border-t border-gray-300 pt-3 mt-3">
 									<div className="text-gray-600">
 										Total: {totalEmissions}k tCO₂e ÷ 5.38M t ={" "}
-										{currentGEI.toFixed(4)} GEI
+										{data.GEI_intensity} GEI
 									</div>
 								</div>
 							</div>
 							<div className="mb-8">
 								<p className="text-4xl font-bold text-red-600 mb-2">
-									₹{(penaltyAmount / 10000000).toFixed(1)}Cr
+									₹
+									{((data.GEI_intensity - data.targetGEI) * 2.2 * 1000).toFixed(
+										1
+									)}
+									Cr
 								</p>
 								<p className="text-sm text-gray-600">
-									{penaltyRiskGap}k tCO₂e gap × ₹1,000/t
+									{(data.GEI_intensity - data.targetGEI) * 2.2}k tCO₂e gap ×
+									₹1,000/t
 								</p>
 							</div>
 						</div>
 
-						<Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-base">
+						<Button
+							onClick={() => {
+								console.log(computeGEI(dat));
+								console.log(dat);
+								console.log("this is not running too");
+								onPageChange("reduce");
+							}}
+							className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-base">
 							GENERATE RECOMMENDATIONS
 						</Button>
 					</div>

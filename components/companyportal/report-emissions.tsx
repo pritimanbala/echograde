@@ -1,6 +1,10 @@
 "use client";
 
-export function ReportEmissionsPage() {
+export function ReportEmissionsPage({
+	onPageChange,
+}: {
+	onPageChange: (page: "dashboard" | "measure" | "collect" | "report" | "reduce") => void;
+}) {
 	const handleDownloadPDF = () => {
 		// Create a mock PDF download
 		const content =
@@ -46,7 +50,9 @@ export function ReportEmissionsPage() {
 				<div className="space-y-4 mb-12">
 					{/* Green ACVA PDF Button */}
 					<button
-						onClick={handleDownloadPDF}
+						onClick={() => {
+							handleDownloadPDF();
+						}}
 						className="w-full bg-linear-to-r from-green-50 to-green-100 border-l-4 border-green-500 p-6 rounded-lg hover:shadow-md transition-shadow text-left">
 						<div className="flex items-center justify-between">
 							<div>

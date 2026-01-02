@@ -2,7 +2,11 @@
 
 import { ChevronRight, Lock } from "lucide-react";
 
-export function ReduceEmissionsPage() {
+export function ReduceEmissionsPage({
+	onPageChange,
+}: {
+	onPageChange: (page: "dashboard" | "measure" | "collect" | "report" | "reduce") => void;
+}) {
 	return (
 		<div className="bg-white min-h-screen p-8">
 			<div className="max-w-6xl mx-auto space-y-8">
@@ -111,7 +115,11 @@ export function ReduceEmissionsPage() {
 							START PHASE 1
 							<ChevronRight className="w-5 h-5" />
 						</button>
-						<button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg flex items-center gap-2 transition">
+						<button
+							onClick={() => {
+								onPageChange("report");
+							}}
+							className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg flex items-center gap-2 transition">
 							DOWNLOAD ACVA PDF
 							<ChevronRight className="w-5 h-5" />
 						</button>

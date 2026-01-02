@@ -31,6 +31,13 @@ export function SolutionsSection() {
 			description: "Assess eligibility and prepare audit-ready documentation for crediting",
 			query: "credit.png",
 		},
+		{
+			id: 6,
+			title: "AI based strategizing",
+			description:
+				"We provide AI based solutions which are based on more than 100+ test cases",
+			query: "ai.png",
+		},
 	];
 
 	return (

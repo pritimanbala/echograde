@@ -24,8 +24,8 @@ export function Header({
 			<div className="flex items-center justify-between px-6 py-4">
 				{/* Logo */}
 				<a href="/" className="flex items-center" style={{ textDecoration: "none" }}>
-					<div className="w-8 h-8 mx-4 bg-gray-800 rounded flex items-center justify-center">
-						<span className="text-white text-sm font-bold">Eg</span>
+					<div className="w-8 h-8 mx-4 bg-transparent rounded flex items-center justify-center">
+						<img src="logo.png" alt="logo" />
 					</div>
 					<span className="text-2xl font-bold text-green-600">ECHO</span>
 					<span className="text-2xl font-bold text-gray-800">grade</span>
@@ -50,7 +50,7 @@ export function Header({
 				{/* CSRD Manager and Icons */}
 				<div className="flex items-center gap-4">
 					<button className="text-sm font-medium text-gray-700 hover:text-gray-900">
-						Admin
+						ACC Chaibasa - CM001GHCK
 					</button>
 					<button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
 						<Settings size={20} className="text-gray-600" />

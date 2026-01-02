@@ -6,41 +6,51 @@ import { useState } from "react";
 import { Paperclip, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface FormData {
-	clinkerProduction: number | "";
-	cementProduction: number | "";
-	coalConsumption: number | "";
-	petcokeMix: number;
-	tsrPercentage: number;
-	totalElectricity: number | "";
-	recsGreenPower: number | "";
-	whrsCapacity: number | "";
-}
-
-type CsvData = {
-	Clinker: string;
-	Cement: string;
-	Coal: string;
-	PetcokeMix: string;
-	TSR: string;
-	Electricity: string;
+type FormData = {
+	clinker: number; // tonnes
+	cement: number; // tonnes
+	coal: number; // tonnes
+	petcokeMix: number; // %
+	tsrPercentage: number; // %
+	electricity: number; // GWh
+	recsGreenPower: number; // GWh
+	whrsCapacity: number; // MW
 };
 
-export function CollectDataPage() {
+type CsvData = {
+	Clinker: number;
+	Cement: number;
+	Coal: number;
+	PetcokeMix: number;
+	TSR: number;
+	Electricity: number;
+	Green: number;
+	WHRS: number;
+};
+
+export function CollectDataPage({
+	dat,
+	setDat,
+	onPageChange,
+}: {
+	dat: object;
+	setDat: React.Dispatch<React.SetStateAction<FormData>>;
+	onPageChange: (page: "dashboard" | "measure" | "collect" | "report" | "reduce") => void;
+}) {
 	const [patFormStatus, setPatFormStatus] = useState<"ready" | "extracting" | "complete">(
 		"ready"
 	);
 	const [extractedFields, setExtractedFields] = useState(0);
 	const [isDragActive, setIsDragActive] = useState(false);
 	const [formData, setFormData] = useState<FormData>({
-		clinkerProduction: "",
-		cementProduction: "",
-		coalConsumption: "",
-		petcokeMix: 30,
-		tsrPercentage: 7,
-		totalElectricity: "",
-		recsGreenPower: "",
-		whrsCapacity: 8,
+		clinker: 0, // tonnes
+		cement: 0, // tonnes
+		coal: 0, // tonnes
+		petcokeMix: 0, // %
+		tsrPercentage: 0, // %
+		electricity: 0, // GWh
+		recsGreenPower: 0, // GWh
+		whrsCapacity: 0, // MW
 	});
 
 	const handleDragEnter = (e: React.DragEvent) => {
@@ -79,30 +89,32 @@ export function CollectDataPage() {
 	};
 
 	const handleCalculate = () => {
-		console.log("Calculating GEI with:", formData);
-		alert("GEI Calculated! Check console for details.");
+		setDat(formData);
+		console.log("data saved");
 	};
 
 	const handleClearForm = () => {
 		setFormData({
-			clinkerProduction: "",
-			cementProduction: "",
-			coalConsumption: "",
-			petcokeMix: 30,
-			tsrPercentage: 7,
-			totalElectricity: "",
-			recsGreenPower: "",
-			whrsCapacity: 8,
+			clinker: 0, // tonnes
+			cement: 0, // tonnes
+			coal: 0, // tonnes
+			petcokeMix: 0, // %
+			tsrPercentage: 0, // %
+			electricity: 0, // GWh
+			recsGreenPower: 0, // GWh
+			whrsCapacity: 0, // MW
 		});
 	};
 
 	const [data, setData] = useState<CsvData>({
-		Clinker: "",
-		Cement: "",
-		Coal: "",
-		PetcokeMix: "",
-		TSR: "",
-		Electricity: "",
+		Clinker: 0.0,
+		Cement: 0.0,
+		Coal: 0.0,
+		PetcokeMix: 0.0,
+		TSR: 0.0,
+		Electricity: 0.0,
+		Green: 0.0,
+		WHRS: 0.0,
 	});
 	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -195,24 +207,38 @@ export function CollectDataPage() {
 										{[
 											{
 												label: "Clinker",
-												value: `${data.Clinker}`,
+												value: `${data.Clinker} t`,
 												status: "✅",
 											},
 											{
 												label: "Cement",
-												value: `${data.Cement}`,
+												value: `${data.Cement} t`,
 												status: "✅",
 											},
-											{ label: "Coal", value: `${data.Coal}`, status: "✅" },
+											{
+												label: "Coal",
+												value: `${data.Coal} t`,
+												status: "✅",
+											},
 											{
 												label: "Petcoke Mix",
-												value: `${data.PetcokeMix}`,
+												value: `${data.PetcokeMix} %`,
 												status: "✅",
 											},
-											{ label: "TSR", value: `${data.TSR}`, status: "✅" },
+											{ label: "TSR", value: `${data.TSR} %`, status: "✅" },
 											{
 												label: "Electricity",
-												value: `${data.Electricity}`,
+												value: `${data.Electricity} kWh/t`,
+												status: "✅",
+											},
+											{
+												label: "WHRS Capacity in MW",
+												value: `${data.WHRS} MW`,
+												status: "✅",
+											},
+											{
+												label: "RECs/Green Power",
+												value: `${data.Green}`,
 												status: "✅",
 											},
 										].map((item, idx) => (
@@ -233,7 +259,24 @@ export function CollectDataPage() {
 							)}
 
 							{patFormStatus === "complete" && (
-								<Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-semibold">
+								<Button
+									onClick={() => {
+										const newData: FormData = {
+											clinker: data.Clinker,
+											cement: data.Cement,
+											coal: data.Coal,
+											petcokeMix: data.PetcokeMix,
+											tsrPercentage: data.TSR,
+											electricity: data.Electricity,
+											recsGreenPower: data.Green,
+											whrsCapacity: data.WHRS,
+										};
+
+										setFormData(newData);
+										setDat(newData);
+										onPageChange("measure");
+										console.log("CSV data saved", newData);
+									}}>
 									CONFIRM & CALCULATE GEI
 								</Button>
 							)}
@@ -243,7 +286,7 @@ export function CollectDataPage() {
 
 				{/* Path 2: Manual Entry Form */}
 				<div>
-					<div className="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6 rounded">
+					<div className="bg-blue-50 border-l-4 border-blue-600 p-4 text-black mb-6 rounded">
 						<h3 className="text-lg font-semibold text-gray-900">
 							Or Enter Data Manually
 						</h3>
@@ -256,39 +299,39 @@ export function CollectDataPage() {
 						{/* Production Section */}
 						<div>
 							<label className="block text-sm font-semibold text-gray-700 mb-2">
-								Clinker Production
+								Clinker Production in tonnes
 							</label>
 							<input
 								type="number"
-								value={formData.clinkerProduction}
+								value={formData.clinker}
 								onChange={(e) =>
 									handleFormChange(
-										"clinkerProduction",
+										"clinker",
 										e.target.value ? Number.parseFloat(e.target.value) : ""
 									)
 								}
 								placeholder="Enter amount"
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-green-600 mt-1">CII Benchmark available</p>
 						</div>
 
 						<div>
 							<label className="block text-sm font-semibold text-gray-700 mb-2">
-								Cement Production <span className="text-red-500">*</span>
+								Cement Production in tonnes <span className="text-red-500">*</span>
 							</label>
 							<input
 								type="number"
-								value={formData.cementProduction}
+								value={formData.cement}
 								onChange={(e) =>
 									handleFormChange(
-										"cementProduction",
+										"cement",
 										e.target.value ? Number.parseFloat(e.target.value) : ""
 									)
 								}
 								placeholder="Enter amount"
 								required
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-gray-500 mt-1">Required for GEI</p>
 						</div>
@@ -300,15 +343,15 @@ export function CollectDataPage() {
 							</label>
 							<input
 								type="number"
-								value={formData.coalConsumption}
+								value={formData.coal}
 								onChange={(e) =>
 									handleFormChange(
-										"coalConsumption",
+										"coal",
 										e.target.value ? Number.parseFloat(e.target.value) : ""
 									)
 								}
 								placeholder="Enter amount"
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-gray-500 mt-1">Default: 95kg/t clinker</p>
 						</div>
@@ -353,19 +396,19 @@ export function CollectDataPage() {
 						{/* Power Section */}
 						<div>
 							<label className="block text-sm font-semibold text-gray-700 mb-2">
-								Total Electricity
+								Total Electricity in kWh/t
 							</label>
 							<input
 								type="number"
-								value={formData.totalElectricity}
+								value={formData.electricity}
 								onChange={(e) =>
 									handleFormChange(
-										"totalElectricity",
+										"electricity",
 										e.target.value ? Number.parseFloat(e.target.value) : ""
 									)
 								}
 								placeholder="Enter GWh"
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-gray-500 mt-1">Default: 115 kWh/t</p>
 						</div>
@@ -384,14 +427,14 @@ export function CollectDataPage() {
 									)
 								}
 								placeholder="Enter amount"
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-gray-500 mt-1">Default: 0</p>
 						</div>
 
 						<div>
 							<label className="block text-sm font-semibold text-gray-700 mb-2">
-								WHRS Capacity
+								WHRS Capacity in MW
 							</label>
 							<input
 								type="number"
@@ -403,7 +446,7 @@ export function CollectDataPage() {
 									)
 								}
 								placeholder="Enter MW"
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 							/>
 							<p className="text-xs text-gray-500 mt-1">
 								Benchmark: 21MW | Default: 8MW
@@ -420,7 +463,10 @@ export function CollectDataPage() {
 							CALCULATE GEI
 						</Button>
 						<Button
-							onClick={handleClearForm}
+							onClick={() => {
+								handleClearForm();
+								onPageChange("measure");
+							}}
 							variant="outline"
 							className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-6 text-lg font-semibold">
 							Clear Form
