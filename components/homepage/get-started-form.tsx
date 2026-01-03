@@ -16,6 +16,7 @@ export function GetStartedForm() {
 		industry: "",
 		plantCompanyName: "",
 		phone: "",
+		ccts: "",
 		email: "",
 		comments: "",
 	});
@@ -56,6 +57,7 @@ export function GetStartedForm() {
 				role: "",
 				industry: "",
 				plantCompanyName: "",
+				ccts: "",
 				phone: "",
 				email: "",
 				comments: "",
@@ -239,7 +241,7 @@ export function GetStartedForm() {
 										<Input
 											id="ccts"
 											name="ccts"
-											value={formData.role}
+											value={formData.ccts}
 											onChange={handleChange}
 											placeholder="e.g., AAAAA001AA"
 											required
