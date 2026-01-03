@@ -269,11 +269,11 @@ export function GetStartedForm() {
 								</div>
 
 								{/* Error Message */}
-								{error && (
+								{/* {error && (
 									<div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-md text-sm">
 										{error}
 									</div>
-								)}
+								)} */}
 
 								{/* Submit Button */}
 								<div className="flex gap-4 pt-6">
@@ -292,9 +292,11 @@ export function GetStartedForm() {
 									</Button>
 								</div>
 
-								<p className="text-xs text-gray-400 text-center">
-									We'll contact you within 12 hours with your sign-in credentials.
-								</p>
+								{error && (
+									<div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-md text-sm">
+										We will contact u after some time.
+									</div>
+								)}
 							</form>
 						)}
 					</div>
